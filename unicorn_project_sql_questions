@@ -1,0 +1,422 @@
+
+/*
+Unicorn_Projects, An exploratory Analysis using SQL
+
+Questions:
+1. How many customers do we have in the data?
+2. What was the city with the most profit for the company in 2015?
+3. In 2015, what was the most profitable city's profit?
+4. How many different cities do we have in the data? Please refer just to the city name and not similar city names in different states
+5. What is the most profitable city in the State of Tennessee?
+6. What is the distribution of customer types in the data?
+7. Which was the biggest order regarding sales in 2015?
+8. Display customer names for customers who are in the segment ‘Consumer’ or ‘Corporate.’ How many customers are there in total?
+9. Calculate the difference between the largest and smallest order quantities for product id ‘100.’
+10. Calculate the percent of products that are within the category ‘Furniture.’ 
+11. Display the number of product manufacturers with more than 1 product in the product table.           
+12. Show the product_subcategory and the total number of products in the subcategory.
+13. Show the order for the most to least number of products.
+14. Show the product_id(s), the sum of quantities, where for each sale of product quantities is greater than or equal to 100.
+*/
+
+-- At the end, I have ask some otehr question to explore teh database more deeply
+-------------------------Exploratory Data Analysis----------------------------------
+
+
+-- 1. How many customers do we have in the data? --> Answer: Total number of customers is 795
+SELECT
+	COUNT(DISTINCT c.customer_id ) AS number_of_customers 
+FROM customers c
+;
+
+--/****/--
+
+-- 2. What was the city with the most profit for the company in 2015? 
+--> Answer: New York City is the city with most profit as 14753 in year 2015
+
+SELECT
+	o.shipping_city AS city,
+  SUM(od.order_profits) AS total_profit
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+WHERE EXTRACT (YEAR FROM o.order_date) = 2015
+GROUP BY city
+ORDER BY total_profit DESC
+LIMIT 1
+;
+
+
+--/****/--
+
+-- 3. In 2015, what was the most profitable city's profit? what is the highest profit for the indivudual order per city?
+--> Answer: The highest profitable city's profit is 4630 for Minneapolis
+
+SELECT
+	o.shipping_city AS city,
+  MAX(od.order_profits) AS highest_order_profit
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+WHERE EXTRACT (YEAR FROM o.order_date) = 2015
+GROUP BY city,o.order_id, o.order_date
+ORDER BY highest_order_profit DESC
+LIMIT 1
+;
+
+-- using subquery
+SELECT
+  o.shipping_city AS city,
+  o.order_id AS order,
+  od.order_profits AS highest_order_profit,
+  o.order_date
+FROM orders o
+JOIN order_details od
+  ON o.order_id = od.order_id
+WHERE EXTRACT(YEAR FROM o.order_date) = 2015
+  AND od.order_profits = ( -- For each order, the subquery looks at the order_details for that order (matching order_id) and returns the highest value of order_profits for that specific order.
+    SELECT MAX(order_profits)
+    FROM order_details
+    WHERE order_id = o.order_id
+  )
+ORDER BY od.order_profits DESC
+LIMIT 10;
+
+--/****/--
+
+-- 4. How many different cities do we have in the data? Please refer just to the city name and not similar city names in different states
+--> Answer: 531 distinct cities are in the database
+
+SELECT 
+	DISTINCT(shipping_city) AS city
+FROM orders
+;
+
+SELECT 
+	COUNT(DISTINCT shipping_city) AS number_of_cities
+FROM orders
+;
+
+--/****/--
+
+-- 5. What is the most profitable city in the State of Tennessee?
+--> Answer: Lebanon is the most profitable city in the Tennessee
+
+
+SELECT
+	o.shipping_city,
+  SUM(od.order_profits) AS total_profit
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+WHERE o.shipping_state = 'Tennessee'
+GROUP BY o.shipping_city -- or GROUP BY 1 --> meaning the groouping by first column
+ORDER BY total_profit DESC
+-- LIMIT 5
+;
+
+--/****/--
+
+-- 6. What is the distribution of customer types in the data?
+--> Answer: Consumer 410	(51 %) , Corporate 237	(29 %), Home Office 148	(18 %)
+
+SELECT
+	customer_segment AS customer_types,
+  COUNT(customer_id) AS number_of_customer,
+	(COUNT(customer_id) * 100 / (SELECT COUNT (*) FROM customers)) || ' %' AS percent_of_total
+FROM customers
+GROUP BY customer_segment
+;
+
+-- with grand total using UNION ALL
+SELECT
+  customer_segment AS customer_types,
+  COUNT(customer_id) AS number_of_customer,
+  ROUND((COUNT(customer_id) * 100.0) / (SELECT COUNT(*) FROM customers),2 )|| ' %' AS percent_of_total
+FROM customers
+GROUP BY customer_segment
+
+UNION ALL
+
+SELECT
+	'Grand Total' AS customer_types,
+  COUNT(customer_id) AS number_of_customer,
+  ROUND((COUNT(customer_id) * 100.0) / (SELECT COUNT(*) FROM customers),2 )|| ' %' AS percent_of_total
+FROM customers
+;
+
+
+--/****/--
+
+-- 7. Which was the biggest order regarding sales in 2015?
+--> Answer: CCA-2015-145317 with23660 sales
+
+SELECT
+	o.order_id AS order,
+  SUM(od.order_sales) AS biggest_order_sales
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+WHERE EXTRACT (YEAR FROM o.order_date) = 2015
+GROUP BY o.order_id
+ORDER BY biggest_order_sales DESC
+LIMIT 1
+;
+
+
+--/****/--
+
+-- 8. Display customer names for customers who are in the segment ‘Consumer’ or ‘Corporate.’ How many customers are there in total?
+--> Answer:  647 customers in total
+
+-- It displays the customer name per segment
+SELECT
+  c.customer_name,
+  c.customer_segment
+FROM customers c
+WHERE c.customer_segment IN ('Consumer', 'Corporate')
+
+-- if adding grand total at the end of table using UNIOn all
+UNION ALL
+
+SELECT
+  'Total Customers' AS customer_name,
+  CAST(COUNT(c.customer_id) AS text) AS customer_segment --> it should be converted because the the above customer type is also text or string, so we have to use CAST here to convert it
+FROM customers c
+WHERE c.customer_segment IN ('Consumer', 'Corporate');
+
+
+
+--/****/--
+
+-- 9. Calculate the difference between the largest and smallest order quantities for product id ‘100.’
+--> Answer: 4
+
+SELECT
+	MAX(od.quantity) - MIN(od.quantity) AS difference_quantity
+FROM order_details od
+WHERE od.product_id = 100
+
+--/****/--
+
+-- 10. Calculate the percent of products that are within the category ‘Furniture.’
+--> Answer: 20.54
+
+-- Using CASE WHEN to count products in furniture where it is true --> it is more faster and efficient expcially if our case when is not complex
+SELECT
+	COUNT(CASE WHEN p.product_category = 'Furniture' THEN 1 END) AS furniture_products,
+  COUNT(*) total_products,
+  ROUND((COUNT(CASE WHEN p.product_category = 'Furniture' THEN 1 END) * 100.0) / COUNT(*),2) AS percent_of_furniture
+FROM product p
+;
+-- similar to customer types using subquery, is also ok here because we want the total count the products once and we dont need to calculate an aggregation for each row
+SELECT
+  ROUND((COUNT(p.product_id) * 100.0) / (SELECT COUNT(*) FROM product),2) AS percent_of_furniture
+FROM product p
+WHERE p.product_category = 'Furniture';
+;
+
+-- using select in from subquery
+SELECT
+  ROUND((furniture_count * 100.0) / total_count,2) AS percent_of_furniture
+FROM
+  (SELECT COUNT(*) AS furniture_count FROM product WHERE product_category = 'Furniture') AS furniture,
+  (SELECT COUNT(*) AS total_count FROM product) AS total
+;
+
+
+SELECT 'Furniture' AS category, COUNT(*) AS product_count
+FROM product
+WHERE product_category = 'Furniture'
+
+UNION ALL
+
+SELECT 'Total' AS category, COUNT(*) AS product_count
+FROM product;
+
+
+--/****/--
+
+-- 11. Display the number of product manufacturers with more than 1 product in the product table.
+--> Answer: 169
+-- showing manufacturer with more than one product
+
+-- using self join
+SELECT COUNT(DISTINCT p.product_manufacturer) AS number_of_manufacturers_with_more_than_1_product
+FROM product p
+JOIN product p2
+  ON p.product_manufacturer = p2.product_manufacturer
+WHERE p.product_id <> p2.product_id
+;
+
+-- with just one product
+SELECT COUNT(DISTINCT p.product_manufacturer) AS number_of_manufacturers_with_one_product
+FROM product p
+LEFT JOIN product p2
+  ON p.product_manufacturer = p2.product_manufacturer 
+  AND p.product_id <> p2.product_id
+WHERE p2.product_id IS NULL;
+
+-- with subquery
+--> this is our subquery which we can use in our outer join to count 
+SELECT	
+	p.product_manufacturer,
+	COUNT(p.product_id) AS product_per_manufacturer
+FROM product p
+GROUP BY p.product_manufacturer
+HAVING COUNT(p.product_id) > 1
+;
+
+
+SELECT COUNT(*) AS number_of_manufacturers_with_more_than_1_product
+FROM (
+  SELECT p.product_manufacturer
+  FROM product p
+  GROUP BY p.product_manufacturer
+  HAVING COUNT(p.product_id) > 1
+) AS manufacturers;
+
+--/****/--
+
+-- 12. Show the product_subcategory and the total number of products in the subcategory.
+--> Answer: A summary Table
+
+SELECT 
+	p.product_subcategory,
+  COUNT(p.product_id) AS total_product
+FROM product p
+GROUP BY p.product_subcategory
+;
+
+--/****/--
+
+-- 13. Show the order for the most to least number of products.
+--> Answer: 
+
+SELECT
+	od.order_id,
+  COUNT(od.product_id) AS numb_product
+FROM order_details od
+GROUP BY od.order_id
+ORDER BY numb_product DESC
+;
+
+
+--/****/--
+
+-- 14. Show the product_id(s), the sum of quantities, where for each sale of product quantities is greater than or equal to 100.
+--> Answer:
+SELECT
+	od.product_id,
+  SUM(od.quantity) AS total_quantity
+  
+FROM order_details od
+GROUP BY od.product_id
+HAVING SUM(od.quantity) >= 100
+;
+
+
+
+
+
+/*
+Join all database tables into one dataset that includes all unique columns and download it as a .csv file.
+*/
+
+SELECT 
+
+--customer columns
+	c.customer_id,
+  c.customer_name,
+  c.customer_segment,
+--order columns 
+  o.order_id,
+  o.order_date,
+  o.shipping_city,
+  o.shipping_state,
+  o.shipping_region,
+  o.shipping_country,
+  o.shipping_postal_code,
+  o.shipping_date,
+  o.shipping_mode,
+  
+--order detail  columns  
+  od.order_details_id,
+  od.quantity, 
+  od.order_discount,
+  od.order_profits,
+  od.order_profit_ratio,
+  od.order_sales,
+  
+--prodcut columns  
+  p.product_id,
+  p.product_name,
+  p.product_category,
+  p.product_subcategory,
+  p.product_manufacturer
+FROM customers c
+
+FULL JOIN orders o
+	ON c.customer_id = o.customer_id
+  
+FULL JOIN order_details od
+	ON o.order_id = od.order_id
+
+FULL JOIN product p
+	ON od.product_id = p.product_id
+;
+
+
+
+
+SELECT 
+
+--customer columns
+	c.customer_id,
+  c.customer_name,
+  c.customer_segment,
+--order columns 
+  o.order_id,
+  o.order_date,
+  o.shipping_city,
+  o.shipping_state,
+  o.shipping_region,
+  o.shipping_country,
+  o.shipping_postal_code,
+  o.shipping_date,
+  o.shipping_mode,
+  
+--order detail  columns  
+  od.order_details_id,
+  od.quantity, 
+  od.order_discount,
+  od.order_profits,
+  od.order_profit_ratio,
+  od.order_sales,
+  
+--prodcut columns  
+  p.product_id,
+  p.product_name,
+  p.product_category,
+  p.product_subcategory,
+  p.product_manufacturer
+FROM customers c
+
+JOIN orders o
+	ON c.customer_id = o.customer_id
+  
+JOIN order_details od
+	ON o.order_id = od.order_id
+
+JOIN product p
+	ON od.product_id = p.product_id
+;
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,697 @@
+
+-------------------------Exploratory Data Analysis----------------------------------
+
+--/****/--
+
+-- 1.	Top performer by: Cities, states, regions, products, categories, subcategories, customer, customer segment
+
+--> Top 10 Cities by Sales 
+
+SELECT 
+	o.shipping_city AS city,
+  SUM(od.order_sales) AS total_sales
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+
+GROUP BY o.shipping_city
+ORDER BY total_sales DESC
+LIMIT 10
+;
+
+--> Top 10 Cities by Profit
+
+SELECT 
+	o.shipping_city AS city,
+  SUM(od.order_profits) AS total_profit
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+
+GROUP BY o.shipping_city
+ORDER BY total_profit DESC
+LIMIT 10
+;
+
+--> Top 10 States by Sales 
+
+SELECT 
+	o.shipping_state AS state,
+  SUM(od.order_sales) AS total_sales
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+
+GROUP BY o.shipping_state
+ORDER BY total_sales DESC
+LIMIT 10
+;
+
+--> Top 10 States by Profit
+
+SELECT 
+	o.shipping_state AS state,
+  SUM(od.order_profits) AS total_profit
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+
+GROUP BY o.shipping_state
+ORDER BY total_profit DESC
+LIMIT 10
+;
+--> Region by Sales 
+
+SELECT 
+	o.shipping_region AS region,
+  SUM(od.order_sales) AS total_sales
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+
+GROUP BY o.shipping_region
+ORDER BY total_sales DESC
+;
+
+--> Region by Profit
+
+SELECT 
+	o.shipping_region AS region,
+  SUM(od.order_profits) AS total_profit
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+
+GROUP BY o.shipping_region
+ORDER BY total_profit DESC
+;
+
+--> Top 10 Products by Sales
+
+SELECT 
+	p.product_id,
+	p.product_name,
+  SUM(od.order_sales) AS total_sales
+FROM order_details od
+JOIN product p
+	ON od.product_id = p.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY total_sales DESC
+LIMIT 10
+;
+
+--> Top 10 Products by Profit
+
+SELECT 
+	p.product_id,
+	p.product_name,
+  SUM(od.order_profits) AS total_profit
+FROM order_details od
+JOIN product p
+	ON od.product_id = p.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY total_profit DESC
+LIMIT 10
+;
+
+--> Top 10 Products by discount
+
+SELECT 
+	p.product_id,
+	p.product_name,
+  SUM(od.order_discount) AS total_discount
+FROM order_details od
+JOIN product p
+	ON od.product_id = p.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY total_discount DESC
+LIMIT 10
+;
+
+--> Top 10 Products by Profit
+
+SELECT 
+	p.product_id,
+	p.product_name,
+  SUM(od.order_profits) AS total_profit
+FROM order_details od
+JOIN product p
+	ON od.product_id = p.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY total_profit DESC
+LIMIT 10
+;
+
+--> --> Top 10 Categories by Sales
+
+SELECT 
+	p.product_category,
+  SUM(od.order_sales) AS total_sales
+FROM order_details od
+JOIN product p
+	ON od.product_id = p.product_id
+GROUP BY p.product_category
+ORDER BY total_sales DESC
+;
+
+--> Top 10 Categories by Profit
+
+SELECT 
+	p.product_category,
+  SUM(od.order_profits) AS total_profit
+FROM order_details od
+JOIN product p
+	ON od.product_id = p.product_id
+GROUP BY p.product_category
+ORDER BY total_profit DESC
+;
+
+--> Top 10 subcategory by Sales
+
+SELECT 
+	p.product_subcategory,
+  SUM(od.order_sales) AS total_sales
+FROM order_details od
+JOIN product p
+	ON od.product_id = p.product_id
+GROUP BY p.product_subcategory
+ORDER BY total_sales DESC
+;
+
+--> Top 10 subcategory by Profit
+
+SELECT 
+	p.product_subcategory,
+  SUM(od.order_profits) AS total_profit
+FROM order_details od
+JOIN product p
+	ON od.product_id = p.product_id
+GROUP BY p.product_subcategory
+ORDER BY total_profit DESC
+;
+
+--> Top 10 manufacturer by Sales
+
+SELECT 
+	p.product_manufacturer,
+  SUM(od.order_sales) AS total_sales
+FROM order_details od
+JOIN product p
+	ON od.product_id = p.product_id
+GROUP BY p.product_manufacturer
+ORDER BY total_sales DESC
+LIMIT 10
+;
+
+--> Top 10 manufacturer by Profit
+
+SELECT 
+	p.product_manufacturer,
+  SUM(od.order_profits) AS total_profit
+FROM order_details od
+JOIN product p
+	ON od.product_id = p.product_id
+GROUP BY p.product_manufacturer
+ORDER BY total_profit DESC
+LIMIT 10
+;
+
+
+--> Top 10 Customer by Sales
+
+SELECT 
+	c.customer_name,
+  c.customer_id,
+  SUM(od.order_sales) AS total_sales
+FROM orders o
+JOIN customers c
+	ON o.customer_id = c.customer_id
+JOIN order_details od
+	ON o.order_id = od.order_id
+GROUP BY c.customer_name, c.customer_id
+ORDER BY total_sales DESC
+LIMIT 10
+;
+
+--> Top 10 Customer by Profit
+SELECT 
+	c.customer_name,
+  c.customer_id,
+  SUM(od.order_profits) AS total_profit
+FROM orders o
+JOIN customers c
+	ON o.customer_id = c.customer_id
+JOIN order_details od
+	ON o.order_id = od.order_id
+GROUP BY c.customer_name, c.customer_id
+ORDER BY total_profit DESC
+LIMIT 10
+;
+
+--> Top 10 Customer by discount
+
+SELECT 
+	c.customer_name,
+  c.customer_id,
+  SUM(od.order_discount) AS total_discount
+FROM orders o
+JOIN customers c
+	ON o.customer_id = c.customer_id
+JOIN order_details od
+	ON o.order_id = od.order_id
+GROUP BY c.customer_name, c.customer_id
+ORDER BY total_discount DESC
+LIMIT 10
+;
+
+--> Top 10 Customer segment by Sales
+
+SELECT 
+	c.customer_segment,
+  SUM(od.order_sales) AS total_sales
+FROM orders o
+JOIN customers c
+	ON o.customer_id = c.customer_id
+JOIN order_details od
+	ON o.order_id = od.order_id
+GROUP BY c.customer_segment
+ORDER BY total_sales DESC
+LIMIT 10
+;
+
+--> Top 10 Customer segment by Profit
+SELECT 
+	c.customer_segment,
+  SUM(od.order_profits) AS total_profit
+FROM orders o
+JOIN customers c
+	ON o.customer_id = c.customer_id
+JOIN order_details od
+	ON o.order_id = od.order_id
+GROUP BY c.customer_segment
+ORDER BY total_profit DESC
+LIMIT 10
+;
+
+--/****/--
+
+-- 2.	Average shipdate
+
+SELECT 
+	AVG(EXTRACT(DAY FROM (o.shipping_date - o.order_date))) AS avg_days_diff
+FROM orders o
+;
+
+--> Average avg_days_diff per order
+SELECT 
+	o.order_id,
+	EXTRACT(DAY FROM (o.shipping_date - o.order_date)) AS avg_days_diff
+  	-- EXTRACT(DAY FROM (o.shipping_date - o.order_date)) is NOT an aggregation function—it is simply a calculation applied to each row individually.
+    -- but grouping by order date makes the table being seperated by orders for each row
+FROM orders o
+GROUP BY o.order_id
+;
+
+--> Average avg_days_diff per city
+
+
+SELECT 
+	DISTINCT o.shipping_city,
+	EXTRACT(DAY FROM (o.shipping_date - o.order_date)) AS avg_days_diff
+FROM orders o
+GROUP BY DISTINCT o.shipping_city, avg_days_diff --> 
+		-- EXTRACT(DAY FROM (o.shipping_date - o.order_date)) is NOT an aggregation function—it is simply a calculation applied to each row individually.
+    -- we need to group by avg_days_diff as it is not an aggregation functiopn
+;
+
+--or grouping by order to have uniqe rows--
+
+SELECT 
+	DISTINCT o.shipping_city,
+	EXTRACT(DAY FROM (o.shipping_date - o.order_date)) AS avg_days_diff
+FROM orders o
+GROUP BY o.order_id
+;
+----------
+SELECT 
+	DISTINCT o.shipping_city,
+	AVG(EXTRACT(DAY FROM (o.shipping_date - o.order_date))) AS avg_days_diff
+FROM orders o
+GROUP BY o.shipping_city
+;
+
+
+--/****/--
+
+-- 3.	Outliers
+/*
+An outlier is a value that is significantly higher or lower than most of the data points in a dataset. 
+One common method to detect outliers is using the mean (AVG) and standard deviation (STDDEV):
+	•	Mean (AVG): Represents the average value of all order_sales.
+	•	Standard Deviation (STDDEV): Measures the spread of the data. A high standard deviation means data points vary a lot from the mean.
+  
+A common rule in statistics is:
+	•	Values outside the range (Mean ± 2 * Standard Deviation) are considered potential outliers.
+	•	This is based on the Empirical Rule (68-95-99.7 Rule):
+	•	68% of values lie within 1 standard deviation of the mean.
+	•	95% of values lie within 2 standard deviations of the mean.
+	•	99.7% of values lie within 3 standard deviations of the mean.
+
+So, if a value falls outside 2 standard deviations, it is in the extreme 5% of values, making it a strong candidate for an outlier.  
+*/
+SELECT
+	od.order_id,
+  od.order_sales
+FROM order_details od
+WHERE 
+			od.order_sales > (
+      SELECT AVG(od.order_sales) + (2 * STDDEV(od.order_sales)) FROM order_details
+   )     
+	OR  od.order_sales < (
+    	SELECT AVG(od.order_sales) - (2 * STDDEV(od.order_sales)) FROM order_details
+  )
+; --> Error
+	/* Issue: Incorrect Reference to od.order_sales in Subquery
+	•	The alias od.order_sales refers to the outer query, but it is being used inside the subquery.
+	•	Problem: AVG(od.order_sales) and STDDEV(od.order_sales) do not work because the subquery does not know what od.order_sales is (it belongs to the outer query).
+	•	Fix: Remove the alias od inside the subquery.
+  */
+  
+/*
+Lesson:
+	•	Subqueries must reference column names from their own scope, not from the outer query.
+	•	Avoid using table aliases inside subqueries unless necessary.
+*/  
+
+--> fixed queries  
+SELECT
+	od.order_id,
+  od.order_sales
+FROM order_details od
+WHERE 
+			od.order_sales > (
+      SELECT AVG(order_sales) + (2 * STDDEV(order_sales)) FROM order_details
+   )     
+	OR  od.order_sales < (
+    	SELECT AVG(order_sales) - (2 * STDDEV(order_sales)) FROM order_details
+  )
+;  
+
+--OR--
+
+SELECT order_id, order_sales
+FROM order_details
+WHERE order_sales > (
+    SELECT AVG(order_sales) + 2 * STDDEV(order_sales) FROM order_details
+) 
+OR order_sales < (
+    SELECT AVG(order_sales) - 2 * STDDEV(order_sales) FROM order_details
+);
+
+--> with CTE
+WITH stats AS (
+    SELECT 
+        AVG(order_sales) AS mean_sales,
+        STDDEV(order_sales) AS stddev_sales
+    FROM order_details
+)
+SELECT od.order_id, od.order_sales
+FROM order_details od
+JOIN stats s ON 1=1
+WHERE od.order_sales > (s.mean_sales + 2 * s.stddev_sales)
+   OR od.order_sales < (s.mean_sales - 2 * s.stddev_sales)
+;
+
+
+/*
+What is a CTE (Common Table Expression)?
+
+A CTE (Common Table Expression) is a temporary result set that I can reference within my main query. 
+It’s defined using the WITH keyword, and it can make complex queries easier to write and understand.
+	•	Purpose of CTEs: CTEs are useful for:
+	•	Breaking down complex queries into smaller, manageable pieces.
+	•	Reusing result sets multiple times in the same query.
+	•	Improving readability and organization of SQL code.
+
+In my query, the CTE is calculating the mean and standard deviation of order_sales from the order_details table. 
+Once the CTE is defined, i can refer to the result of the CTE as if it’s a table within the main query.
+
+Why Use a CTE Here?
+
+I am using a CTE to calculate the mean and standard deviation of order_sales. This is useful because:
+	•	I only need to calculate the mean and standard deviation once.
+	•	I can reference these calculations multiple times in the main query (avoiding duplicate calculations).
+	•	It makes the query more readable and easier to manage, especially when I want to use these statistics in a filter.
+
+
+•	JOIN stats s ON 1=1:
+	•	This is a cross join using ON 1=1, which means that for each row in order_details, the result of the CTE (stats) is joined once.
+	•	Since there is no explicit condition in the ON clause other than 1=1 (which is always true), this join simply combines each row in order_details with the result of the CTE.
+	•	Essentially, it appends the mean and standard deviation values to every row of the order_details table.
+
+Why Use JOIN stats ON 1=1?
+	•	Since the CTE only returns one row (the statistics), and i want to apply these statistics to every row of the order_details table, a cross join (ON 1=1) is used.
+	•	This cross joins each row of order_details with the single row from the stats CTE.
+	•	Without a proper JOIN, i’d not be able to use the CTE’s calculated statistics in the WHERE clause.
+
+Summary
+	•	The CTE (stats) calculates the mean and standard deviation of order_sales from the order_details table.
+	•	The main query joins the order_details table with the CTE to apply these statistics to every row.
+	•	The JOIN ON 1=1 essentially cross joins the results of the CTE to each row of order_details.
+	•	The WHERE clause then filters outliers based on the mean ± 2 * STDDEV rule.
+  
+  
+What is a Cross Join?
+
+A cross join is a type of join where every row from the left table is combined with every row from the right table. 
+In simple terms, it produces the Cartesian product of the two tables.
+	•	For example, if you have:
+	•	Table A with 3 rows
+	•	Table B with 4 rows
+	•	The result of a cross join will be 3 × 4 = 12 rows. 
+Cross Join vs Other Joins
+	•	A cross join is used here because the CTE returns only one row, and we want to attach this one row to every row in order_details.
+	•	This differs from a regular join (like INNER JOIN), where you would join two tables based on matching values between the tables.  
+
+*/
+
+
+--> Which year had the highest profit, sales, and profit ratio between 2015 and 2018?
+
+SELECT
+	EXTRACT (YEAR FROM o.order_date) AS year,
+  SUM(od.order_sales) AS total_sales,
+  SUM(od.order_profits) AS total_profit,
+  -- SUM(od.order_profit_ratio) AS profitt_ratio, --> this is a reminder to know that simply adding up existing ratio wont give us the accurate ratio of each year
+  (SUM(od.order_profits) / SUM(od.order_sales)) AS profit_ratio
+
+FROM orders o
+JOIN order_details od
+	ON o.order_id = od.order_id
+
+GROUP BY year
+ORDER BY year DESC
+;
+
+
+--> Churn Analysis
+
+/*
+Who would be considered as Churn : Customers who haven’t made a purchase in the last 12 months.
+So it means who doesnt have any purchase after 31-12-2017
+*/
+-- Customers who "have" ordered in the last 12 months (from the end of 2018)
+SELECT
+	c.customer_id,
+  c.customer_name
+FROM customers c
+JOIN orders o
+	c.customer_id = o.customer_id
+WHERE o.order_date > '2017-12-31'  
+;
+
+
+-- Customers who "haven't" ordered in the last 12 months (from the end of 2018)
+SELECT 
+	customer_id, 
+  customer_name
+FROM customers
+WHERE customer_id NOT IN (
+    SELECT DISTINCT customer_id
+    FROM orders
+    WHERE order_date > '2017-12-31'
+);
+/*
+Key Differences:
+	•	Purpose:
+	•	The JOIN query is retrieving a list of active customers by joining the customers and orders tables and filtering for those who have ordered after a specific date.
+	•	The subquery is used to retrieve a list of churned customers, which are customers who have not ordered after the specified date.
+	•	Performance:
+	•	JOIN typically performs better than subqueries because it directly combines the data in a single step. However, if the dataset is large, subqueries can become slower due to the repeated filtering for each row.
+	•	Subqueries can sometimes be less efficient, especially with larger datasets, because the database must execute the inner query for each row in the outer query. However, for filtering or exclusion (like NOT IN), they can sometimes be more straightforward and easier to understand.
+
+•	Use Case:
+	•	JOINs are ideal when you need related data from multiple tables (e.g., a list of active customers along with their orders).
+	•	Subqueries are better for filtering or exclusion, such as when you need to find customers who don’t meet a certain condition, like not having made a recent purchase.
+  
+  Why Use One Over the Other?
+	•	You should use a subquery if your goal is to filter out customers based on a condition that involves another table (like finding churned customers).
+	•	You should use a JOIN if you want to retrieve related data from both tables for customers who meet certain conditions (like active customers with recent orders).
+  
+  Recap:
+	•	The JOIN approach will give you customers who have placed orders after the cutoff date, showing active customers.
+	•	The subquery approach will give you customers who have not placed orders after the cutoff date, showing churned customers.
+*/
+
+
+-- with CTE
+WITH recent_orders AS(
+  			SELECT DISTINCT customer_id
+  			FROM orders
+  			WHERE order_date > '2017-12-31'
+)
+
+SELECT
+	c.customer_id,
+	c.customer_name
+FROM customers c
+WHERE c.customer_id NOT IN (SELECT customer_id FROM recent_orders);
+
+
+--> Cohort Analysis for tracking customer retention
+
+/*
+Cohort Analysis is a technique used to group customers (or users) into subsets based on shared characteristics or behaviors, and then track how these groups behave over time. 
+It’s widely used in business and marketing to analyze retention, churn, and other metrics related to customer engagement.
+
+-- How Cohort Analysis Helps:
+	1.	Retention Trends:
+	•	By tracking retention over months, cohort analysis helps you identify patterns, such as whether customers are sticking around or if they’re dropping off after their first purchase.
+	•	This is helpful for businesses to understand customer loyalty and engagement over time.
+	2.	Understanding Customer Behavior:
+	•	Cohort analysis can be used to see if marketing efforts or product changes influence customer retention.
+	•	For example, if you launched a marketing campaign in March 2016 and saw a spike in retained customers from the January cohort in that month, it could indicate that the campaign was effective.
+	3.	Comparing Different Cohorts:
+	•	If you track multiple cohorts (e.g., customers who made their first purchase in January 2016, February 2016, etc.), you can compare how different groups of customers behave over time.
+	•	This helps you understand if your customer base is becoming more or less loyal, or if specific cohorts are more likely to return.
+	4.	Identifying Churn:
+	•	Cohort analysis can also help you detect when customers stop making purchases, which is crucial for understanding churn. If a cohort has a low retention rate in later months, that could be a sign that your business needs to improve customer engagement strategies.
+
+
+In the context of the SQL query you’ve provided, 
+the goal is to track customer retention by grouping customers based on the month of their first purchase and then examining their behavior 
+(i.e., whether they made subsequent purchases) over the following months.
+
+Summary of How It Works:
+	•	The cohort is defined based on the month of a customer’s first purchase.
+	•	The retention is tracked by counting how many customers from each cohort make additional purchases over subsequent months.
+	•	The final result shows the retention behavior of customers over time, which helps you evaluate customer loyalty and identify trends.
+*/
+
+-- Group customers by the month they first made a purchase, and track their retention over months
+WITH cohort AS (
+  	SELECT 
+  		customer_id,
+  		MIN(EXTRACT(MONTH FROM order_date)) AS first_purchase_month
+  	FROM orders
+  	GROUP BY customer_id
+)
+SELECT
+	c.first_purchase_month,
+  EXTRACT(MONTH FROM o.order_date) AS order_month,
+  COUNT(DISTINCT o.customer_id) AS retained_customers
+FROM cohort c
+JOIN orders o
+	ON c.customer_id = o.customer_id
+GROUP BY c.first_purchase_month, order_month
+ORDER BY c.first_purchase_month, order_month
+;
+-----
+WITH cohort AS (
+  	SELECT 
+  		customer_id,
+  		EXTRACT(YEAR FROM MIN(order_date)) AS first_purchase_year,
+  		EXTRACT(MONTH FROM MIN(order_date)) AS first_purchase_month
+  	FROM orders
+  	GROUP BY customer_id
+)
+SELECT
+	c.first_purchase_year,
+	c.first_purchase_month,
+  EXTRACT(YEAR FROM o.order_date) AS order_year,
+  EXTRACT(MONTH FROM o.order_date) AS order_month,
+  COUNT(DISTINCT o.customer_id) AS retained_customers
+FROM cohort c
+JOIN orders o
+	ON c.customer_id = o.customer_id
+GROUP BY c.first_purchase_year, c.first_purchase_month, order_year, order_month
+ORDER BY c.first_purchase_year, c.first_purchase_month, order_year, order_month
+LIMIT 10
+;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
